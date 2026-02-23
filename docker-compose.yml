@@ -103,6 +103,9 @@ services:
     image: devilbox/php-fpm:${PHP_SERVER}-work-0.151
     hostname: php
 
+    ports:
+      - "8081-8200:8081-8200"
+
     ##
     ## All .env variables
     ##
@@ -377,6 +380,11 @@ services:
       - php
       - httpd
 
+    ulimits:
+      nofile:
+        soft: 32768
+        hard: 32768
+
 
   # ------------------------------------------------------------
   # PostgreSQL
@@ -486,6 +494,31 @@ services:
       - bind
       - php
       - httpd
+
+
+  # ------------------------------------------------------------
+  # RabbitMQ
+  # ------------------------------------------------------------
+  # https://hub.docker.com/_/rabbitmq
+  rabbitmq:
+    image: rabbitmq:3-management
+    hostname: rabbitmq
+
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=schoolink
+
+    ports:
+      # [local-machine:]local-port:docker-port
+      - "${LOCAL_LISTEN_ADDR}5672:5672"
+      - "${LOCAL_LISTEN_ADDR}15672:15672"
+
+    networks:
+      app_net:
+        ipv4_address: 172.16.238.17
+
+    depends_on:
+      - bind
 
 
 ################################################################################
